@@ -60,7 +60,8 @@ typedef struct _thread_pool_t thread_pool_t;
 thread_pool_t g_thread_pool;
 
 /*Set thread's status*/
-int thread_pool_setthreadsstatus(thread_data_t* thread_data, thread_status_e status)
+int 
+thread_pool_setthreadsstatus(thread_data_t* thread_data, thread_status_e status)
 {
     thread_pool_t* thread_pool = &g_thread_pool;
     pthread_mutex_lock(&(thread_pool->thread_pool_lock));
@@ -74,7 +75,8 @@ int thread_pool_setthreadsstatus(thread_data_t* thread_data, thread_status_e sta
 
 
 /*Thread's function.*/
-void* thread_pool_func(void* arg)
+void* 
+thread_pool_func(void* arg)
 {
     sleep(1);   //Wait pthread_t count.
 
@@ -105,7 +107,8 @@ void* thread_pool_func(void* arg)
 }
 
 
-int thread_task_init(thread_task_t* thread_task)
+int 
+thread_task_init(thread_task_t* thread_task)
 {
 
     thread_task->taskid             = -1;
@@ -116,7 +119,8 @@ int thread_task_init(thread_task_t* thread_task)
 }
 
 
-int thread_data_init(thread_data_t* thread_data)
+int 
+thread_data_init(thread_data_t* thread_data)
 {
     thread_data->thread_id = -1;
     thread_data->pid = 0x0;
@@ -129,7 +133,8 @@ int thread_data_init(thread_data_t* thread_data)
 }
 
 
-int thread_pool_create(int num_thread)
+int 
+thread_pool_create(int num_thread)
 {
     ASSERT(num_thread > 0 && num_thread <= 10*1024);
     thread_pool_t* thread_pool = &g_thread_pool;
@@ -166,7 +171,8 @@ int thread_pool_create(int num_thread)
 }
 
 
-void* test_func(void* arg)
+void* 
+test_func(void* arg)
 {
     int t_sleep = (int)arg;
     DBGPRINTF_DEBUG("Test func. Sleep %d .\n", t_sleep);
@@ -188,7 +194,8 @@ void* test_func(void* arg)
 
 
 /*Find out which thread is free.*/
-int thread_pool_queryfree(thread_data_t** thread_data_found)
+int 
+thread_pool_queryfree(thread_data_t** thread_data_found)
 {
     *thread_data_found = NULL;
     thread_pool_t* thread_pool = &g_thread_pool;
@@ -211,7 +218,8 @@ int thread_pool_queryfree(thread_data_t** thread_data_found)
 }
 
 /*Get a new taskid.*/
-int thread_pool_gettaskid(int* taskid)
+int 
+thread_pool_gettaskid(int* taskid)
 {
     thread_pool_t* thread_pool = &g_thread_pool;
     pthread_mutex_lock(&(thread_pool->thread_pool_lock));
@@ -225,7 +233,8 @@ int thread_pool_gettaskid(int* taskid)
 }
 
 /*Add task to thread-pool.*/
-int thread_pool_addtask(thread_task_func task_func, void* arg)
+int 
+thread_pool_addtask(thread_task_func task_func, void* arg)
 {
     /* Find a free thread. */
     thread_data_t* thread_data_found = NULL;
@@ -257,7 +266,8 @@ int thread_pool_addtask(thread_task_func task_func, void* arg)
 
 
 
-int main()
+int 
+main()
 {
     thread_pool_create(10);
 	
