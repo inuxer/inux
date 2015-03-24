@@ -6,27 +6,25 @@
 #include <assert.h>
 #include <sys/types.h>
 
+#include "thread-control.h"
+
 #define DBGPRINTF_DEBUG printf
 #define DBGPRINTF_ERROR printf
-
 #define ASSERT  assert
-
-
-
-#include "thread-control.h"
 
 typedef void*(*thread_task_func)(void* arg);
 
-/*线程执行任务的数据.*/
+/*Task need be executed by thread*/
 struct _thread_task_t
 {
-    int taskid;                     /*任务id.*/
-    thread_task_func task_func;     /*任务函数及参数*/
+    int taskid;                     /*Task id.*/
+    thread_task_func task_func;     /*Task function and it's arg*/
     void* task_arg;
 };
+
 typedef struct _thread_task_t thread_task_t;
 
-/*线程状态.*/
+/*Thread's status.*/
 typedef enum
 {
     ethread_status_unknown = 0,
@@ -36,7 +34,7 @@ typedef enum
     ethread_status_cannotuse ,
 }thread_status_e;
 
-/*线程数据.*/
+/*Thread's parameter.*/
 struct _thread_data_t
 {
     int thread_id;
@@ -48,7 +46,7 @@ struct _thread_data_t
 };
 typedef struct _thread_data_t thread_data_t;
 
-/*线程池数据.*/
+/*Thread-pool's parameter*/
 struct _thread_pool_t
 {
     thread_data_t* thread_data_set;
@@ -61,8 +59,8 @@ typedef struct _thread_pool_t thread_pool_t;
 
 thread_pool_t g_thread_pool;
 
-/*设置线程状态.*/
-int thread_pool_setthreadstatus(thread_data_t* thread_data, thread_status_e status)
+/*Set thread's status*/
+int thread_pool_setthreadsstatus(thread_data_t* thread_data, thread_status_e status)
 {
     thread_pool_t* thread_pool = &g_thread_pool;
     pthread_mutex_lock(&(thread_pool->thread_pool_lock));
@@ -75,7 +73,7 @@ int thread_pool_setthreadstatus(thread_data_t* thread_data, thread_status_e stat
 }
 
 
-/*线程池线程函数体.*/
+/*Thread's function.*/
 void* thread_pool_func(void* arg)
 {
     sleep(1);   //Wait pthread_t count.
@@ -92,14 +90,14 @@ void* thread_pool_func(void* arg)
         thread_control_wait(thread_data->thread_control);
         
         //Need to lock? Yes.
-        thread_pool_setthreadstatus(thread_data, ethread_status_running);
+        thread_pool_setthreadsstatus(thread_data, ethread_status_running);
         DBGPRINTF_DEBUG("Task start. taskid = %d .\n", thread_data->thread_task.taskid);
 
         thread_data->thread_task.task_func(thread_data->thread_task.task_arg);
 
         DBGPRINTF_DEBUG("Task end. taskid = %d .\n", thread_data->thread_task.taskid);
         //Need to lock?Yes.
-        thread_pool_setthreadstatus(thread_data, ethread_status_idle);
+        thread_pool_setthreadsstatus(thread_data, ethread_status_idle);
     }
 
     DBGPRINTF_DEBUG("Thread end run. Thread_id = %d, pid = 0x%x . \n", 
@@ -168,8 +166,6 @@ int thread_pool_create(int num_thread)
 }
 
 
-
-
 void* test_func(void* arg)
 {
     int t_sleep = (int)arg;
@@ -191,7 +187,7 @@ void* test_func(void* arg)
 }
 
 
-/*查询可接收任务的线程.*/
+/*Find out which thread is free.*/
 int thread_pool_queryfree(thread_data_t** thread_data_found)
 {
     *thread_data_found = NULL;
@@ -214,7 +210,7 @@ int thread_pool_queryfree(thread_data_t** thread_data_found)
     return 0;
 }
 
-/*分配taskid.*/
+/*Get a new taskid.*/
 int thread_pool_gettaskid(int* taskid)
 {
     thread_pool_t* thread_pool = &g_thread_pool;
@@ -228,7 +224,7 @@ int thread_pool_gettaskid(int* taskid)
     return 0;
 }
 
-/*向线程池增加任务.*/
+/*Add task to thread-pool.*/
 int thread_pool_addtask(thread_task_func task_func, void* arg)
 {
     /* Find a free thread. */
@@ -245,7 +241,7 @@ int thread_pool_addtask(thread_task_func task_func, void* arg)
         thread_pool_gettaskid(&(thread_data_found->thread_task.taskid));
 
         /* Start the task. */
-        thread_pool_setthreadstatus(thread_data_found, ethread_status_running);
+        thread_pool_setthreadsstatus(thread_data_found, ethread_status_running);
         thread_control_start(thread_data_found->thread_control);
         DBGPRINTF_DEBUG("Thread [%d] Add task[%d] finished.\n", 
                 thread_data_found->thread_id, thread_data_found->thread_task.taskid);
@@ -264,7 +260,7 @@ int thread_pool_addtask(thread_task_func task_func, void* arg)
 int main()
 {
     thread_pool_create(10);
-    //thread_pool_create(10);
+	
     thread_pool_addtask(test_func, (void*)(1<<0));
     thread_pool_addtask(test_func, (void*)(1<<1));
     thread_pool_addtask(test_func, (void*)(1<<2));
