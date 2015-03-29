@@ -97,7 +97,7 @@ int evutil_make_socket_nonblocking(int sock);
 
 #define EVUTIL_CLOSESOCKET(s) close(s)
 #define EVUTIL_SOCKET_ERROR() (errno)
-#define EVUTIL_SET_SOCKET_ERROR(errcode)		\
+#define EVUTIL_SET_SOCKET_ERROR(errcode)	\
 		do { errno = (errcode); } while (0)
 
 /*
