@@ -116,7 +116,7 @@ int evutil_make_socket_nonblocking(int sock);
 			(vvp)->tv_usec -= 1000000;							\
 		}														\
 	} while (0)
-#define	evutil_timersub(tvp, uvp, vvp)						\
+#define	evutil_timersub(tvp, uvp, vvp)						 \
 	do {													\
 		(vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;		\
 		(vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec;	\
