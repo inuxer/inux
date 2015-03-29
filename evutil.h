@@ -97,8 +97,7 @@ int evutil_make_socket_nonblocking(int sock);
 
 #define EVUTIL_CLOSESOCKET(s) close(s)
 #define EVUTIL_SOCKET_ERROR() (errno)
-#define EVUTIL_SET_SOCKET_ERROR(errcode)	\
-		do { errno = (errcode); } while (0)
+#define EVUTIL_SET_SOCKET_ERROR(errcode)	do { errno = (errcode); } while (0)
 
 /*
  * Manipulation functions for struct timeval
@@ -107,41 +106,20 @@ int evutil_make_socket_nonblocking(int sock);
 #define evutil_timeradd(tvp, uvp, vvp) timeradd((tvp), (uvp), (vvp))
 #define evutil_timersub(tvp, uvp, vvp) timersub((tvp), (uvp), (vvp))
 #else
-#define evutil_timeradd(tvp, uvp, vvp)						    \
-	do {														\
-		(vvp)->tv_sec = (tvp)->tv_sec + (uvp)->tv_sec;			\
-		(vvp)->tv_usec = (tvp)->tv_usec + (uvp)->tv_usec;       \
-		if ((vvp)->tv_usec >= 1000000) {						\
-			(vvp)->tv_sec++;									\
-			(vvp)->tv_usec -= 1000000;							\
-		}														\
-	} while (0)
-#define	evutil_timersub(tvp, uvp, vvp)						 \
-	do {													\
-		(vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;		\
-		(vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec;	\
-		if ((vvp)->tv_usec < 0) {							\
-			(vvp)->tv_sec--;								\
-			(vvp)->tv_usec += 1000000;						\
-		}													\
-	} while (0)
+#error "I don't hava manipulation functions for struct timeval."
 #endif /* !_EVENT_HAVE_HAVE_TIMERADD */
 
 #ifdef _EVENT_HAVE_TIMERCLEAR
 #define evutil_timerclear(tvp) timerclear(tvp)
 #else
-#define	evutil_timerclear(tvp)	(tvp)->tv_sec = (tvp)->tv_usec = 0
+#error "I don't hava function timerclear."
 #endif
 
-#define	evutil_timercmp(tvp, uvp, cmp)							\
-	(((tvp)->tv_sec == (uvp)->tv_sec) ?							\
-	 ((tvp)->tv_usec cmp (uvp)->tv_usec) :						\
-	 ((tvp)->tv_sec cmp (uvp)->tv_sec))
+
+#define	evutil_timercmp(tvp, uvp, cmp) timercmp(tvp, uvp, cmp) 
 
 #ifdef _EVENT_HAVE_TIMERISSET
 #define evutil_timerisset(tvp) timerisset(tvp)
-#else
-#define	evutil_timerisset(tvp)	((tvp)->tv_sec || (tvp)->tv_usec)
 #endif
 
 
@@ -151,9 +129,6 @@ ev_int64_t evutil_strtoll(const char *s, char **endptr, int base);
 
 #ifdef _EVENT_HAVE_GETTIMEOFDAY
 #define evutil_gettimeofday(tv, tz) gettimeofday((tv), (tz))
-#else
-struct timezone;
-int evutil_gettimeofday(struct timeval *tv, struct timezone *tz);
 #endif
 
 int evutil_snprintf(char *buf, size_t buflen, const char *format, ...)
