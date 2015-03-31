@@ -37,13 +37,20 @@
 #include <stdio.h>
 #include <signal.h>
 #include <sys/queue.h>
+
 #include "event.h"
 #include "event-internal.h"
 #include "evutil.h"
 #include "log.h"
 
-#define evutil_socketpair(family, type, protocol, fd[2]) socketpair(family, type, protocol, fd[2])
 #define evutil_gettimeofday(tv, tz) gettimeofday((tv), (tz))   
+
+int
+evutil_socketpair(int family, int type, int protocol, int fd[2])
+{
+	return socketpair(family, type, protocol, fd);
+}
+
 
 int
 evutil_make_socket_nonblocking(int fd)
