@@ -52,7 +52,7 @@
  */
  
  /*event epoll: includes read-event and write-event*/
-struct evepolloll {
+struct evepoll {
 	struct event *evread;
 	struct event *evwrite;
 };
@@ -209,9 +209,9 @@ epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 			return (-1);
 		}
 
-		evsignal_process(base);	/*remember to process signal event*/
+		evsignal_process(base);	/*epoll_wait interrupted by signal event*/
 		return (0);
-	} else if (base->sig.evsignal_caught) {
+	} else if (base->sig.evsignal_caught) {/*signal event occurs, process signal event*/
 		evsignal_process(base);
 	}
 
@@ -321,7 +321,7 @@ epoll_del(void *arg, struct event *ev)
 {
 	struct epollop *epollop = arg;
 	struct epoll_event epollevent = {0, {0}};
-	struct evepolloll *evepoll;
+	struct evepoll *evepoll;
 	int fd, events, op;
 	int needwritedelete = 1, needreaddelete = 1;
 
